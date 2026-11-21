@@ -1,39 +1,11 @@
+import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { Menu, X, Leaf } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
-  const links = [
-    { to: '/', label: 'Home' },
-    { to: '/about', label: 'About' },
-    { to: '/features', label: 'Features' },
-    { to: '/nutritionists', label: 'Nutritionists' },
-    { to: '/hub', label: 'Educational Hub' },
-    { to: '/pricing', label: 'Pricing' },
-    { to: '/contact', label: 'Contact' },
-    { to: '/login', label: 'Login' },
-    { to: '/register', label: 'Register' },
-  ];
-
-  return (
-    <nav className="bg-forest text-cream py-4 shadow-md">
-      <div className="container mx-auto flex items-center justify-between px-4">
-        <Link to="/" className="text-2xl font-heading">
-          NutriFlex
-        </Link>
-        <ul className="flex space-x-4 text-body">
-          {links.map((l) => (
-            <li key={l.to}>
-              <NavLink
-                to={l.to}
-                className={({ isActive }) =>
-                  isActive ? 'text-gold underline' : 'hover:text-sage'
-                }
-              >
-                {l.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
-  );
+  const [open,setOpen]=useState(false); const {user,logout}=useAuth();
+  const links=[['/about','About'],['/features','Features'],['/nutritionists','Nutritionists'],['/hub','Educational Hub'],['/pricing','Pricing']];
+  const navLink=([to,label])=><NavLink key={to} to={to} onClick={()=>setOpen(false)} className={({isActive})=>`nf-nav-link ${isActive?'active':''}`}>{label}</NavLink>;
+  return <header className="nf-header"><nav className="nf-nav"><Link to="/" className="nf-brand"><span><Leaf size={18}/></span><b>Nutri<span>Flex</span></b></Link><div className={`nf-nav-links ${open?'open':''}`}>{links.map(navLink)}<NavLink to="/contact" onClick={()=>setOpen(false)} className="nf-nav-link">Contact</NavLink>{user?<><NavLink to="/dashboard" onClick={()=>setOpen(false)} className="nf-nav-link">My dashboard</NavLink>{user.role==='admin'&&<NavLink to="/admin" onClick={()=>setOpen(false)} className="nf-nav-link">Admin</NavLink>}<button className="nf-nav-cta" onClick={()=>{setOpen(false);logout();}}>Sign out</button></>:<><NavLink to="/login" onClick={()=>setOpen(false)} className="nf-nav-link">Log in</NavLink><Link onClick={()=>setOpen(false)} to="/register" className="nf-nav-cta">Get started <span>↗</span></Link></>}</div><button className="nf-menu-toggle" aria-label={open?'Close menu':'Open menu'} onClick={()=>setOpen(!open)}>{open?<X/>:<Menu/>}</button></nav></header>
 }

@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 import os
 from app import create_app, db
-from flask_migrate import Migrate
 
 app = create_app()
-
-# Initialize Flask-Migrate (optional, but helpful for DB migrations)
-Migrate(app, db)
 
 if __name__ == '__main__':
     # Ensure the instance folder exists

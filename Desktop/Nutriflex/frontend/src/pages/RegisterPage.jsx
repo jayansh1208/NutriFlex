@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -14,10 +14,9 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { token } = useAuth(); // just to know if already logged in
 
-  if (token) {
-    navigate('/dashboard');
-    return null;
-  }
+  useEffect(() => { if (token) navigate('/dashboard', { replace: true }); }, [token, navigate]);
+
+  if (token) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

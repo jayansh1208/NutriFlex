@@ -1,5 +1,5 @@
 from datetime import datetime
-from . import db
+from .. import db
 from sqlalchemy import Enum
 import enum
 

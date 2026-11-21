@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
@@ -11,11 +11,10 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login, user } = useAuth();
 
+  useEffect(() => { if (user) navigate('/dashboard', { replace: true }); }, [user, navigate]);
+
   // If already logged in, redirect to dashboard
-  if (user) {
-    navigate('/dashboard');
-    return null;
-  }
+  if (user) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

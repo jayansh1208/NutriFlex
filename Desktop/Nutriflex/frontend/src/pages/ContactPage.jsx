@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
+import api from '../services/api';
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [status,setStatus]=useState(''); const [busy,setBusy]=useState(false);
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // No backend – just clear the form
-    alert('Message sent (simulated).');
-    setForm({ name: '', email: '', message: '' });
+    setStatus('');setBusy(true);
+    try { const res=await api.post('/contact/',form);setStatus(res.data.message||'Thanks for reaching out.');setForm({ name: '', email: '', message: '' }); }
+    catch(err){setStatus(err.response?.data?.message||'We could not send your message. Please try again.');}
+    finally{setBusy(false);}
   };
 
   return (
@@ -24,6 +27,7 @@ export default function ContactPage() {
       </section>
       <section className="max-w-2xl mx-auto px-4">
         <form onSubmit={handleSubmit} className="grid gap-4">
+          {status&&<p role="status" className="text-forest">{status}</p>}
           <input
             name="name"
             type="text"
@@ -51,8 +55,8 @@ export default function ContactPage() {
             required
             className="p-2 border border-sage rounded bg-cream text-forest placeholder-forest"
           />
-          <button type="submit" className="px-6 py-2 bg-forest text-cream rounded hover:bg-sage transition">
-            Send Message
+          <button type="submit" disabled={busy} className="px-6 py-2 bg-forest text-cream rounded hover:bg-sage transition disabled:opacity-60">
+            {busy?'Sending…':'Send Message'}
           </button>
         </form>
       </section>

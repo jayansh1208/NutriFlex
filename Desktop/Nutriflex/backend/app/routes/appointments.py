@@ -2,8 +2,9 @@ from flask import Blueprint, request, jsonify
 from .. import db
 from ..models.appointment import Appointment, AppointmentStatus
 from ..models.nutritionist import Nutritionist
+from ..models.content import Payment
 from ..utils.responses import success, error
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from datetime import datetime
 
 appointments_bp = Blueprint('appointments', __name__)
@@ -15,7 +16,10 @@ def create_appointment():
     data = request.get_json()
     if not data:
         return error('Invalid JSON', 400)
-    nutritionist_id = data.get('nutritionist_id')
+    try:
+        nutritionist_id = int(data.get('nutritionist_id'))
+    except (TypeError, ValueError):
+        return error('Select a valid nutritionist.', 400)
     date_str = data.get('date')  # Expected format YYYY-MM-DD
     time_str = data.get('time')  # Expected format HH:MM (24h)
     if not all([nutritionist_id, date_str, time_str]):
@@ -30,17 +34,18 @@ def create_appointment():
         time_obj = datetime.strptime(time_str, '%H:%M').time()
     except ValueError:
         return error('Invalid date or time format', 400)
-    # Prevent duplicate slot booking (only confirmed slots block)
+    if date_obj < datetime.utcnow().date():
+        return error('Choose a date that is today or later.', 400)
+    # The database slot constraint includes all statuses, so reject any prior slot record clearly.
     existing = Appointment.query.filter_by(
         nutritionist_id=nutritionist_id,
         date=date_obj,
         time=time_obj,
-        status=AppointmentStatus.CONFIRMED,
     ).first()
     if existing:
         return error('Slot already booked', 409)
     # Create pending appointment
-    user_id = get_jwt_identity()['id']
+    user_id = int(get_jwt_identity())
     appt = Appointment(
         user_id=user_id,
         nutritionist_id=nutritionist_id,
@@ -56,9 +61,8 @@ def create_appointment():
 @appointments_bp.route('/', methods=['GET'])
 @jwt_required()
 def list_appointments():
-    identity = get_jwt_identity()
-    user_id = identity['id']
-    role = identity.get('role')
+    user_id = int(get_jwt_identity())
+    role = get_jwt().get('role')
     if role == 'admin':
         appointments = Appointment.query.all()
     else:
@@ -79,12 +83,15 @@ def list_appointments():
 @appointments_bp.route('/<int:appointment_id>/confirm', methods=['POST'])
 @jwt_required()
 def confirm_appointment(appointment_id):
-    user_id = get_jwt_identity()['id']
+    user_id = int(get_jwt_identity())
     appt = Appointment.query.filter_by(id=appointment_id, user_id=user_id).first()
     if not appt:
         return error('Appointment not found', 404)
     if appt.status != AppointmentStatus.PENDING:
         return error('Only pending appointments can be confirmed', 400)
+    payment=Payment.query.filter_by(appointment_id=appt.id).first()
+    if not payment or payment.status not in ('paid','demo_succeeded'):
+        return error('A verified checkout is required before confirming this appointment.',402)
     # Ensure no other confirmed appointment occupies the same slot
     conflict = Appointment.query.filter_by(
         nutritionist_id=appt.nutritionist_id,
@@ -102,7 +109,7 @@ def confirm_appointment(appointment_id):
 @appointments_bp.route('/<int:appointment_id>', methods=['DELETE'])
 @jwt_required()
 def cancel_appointment(appointment_id):
-    user_id = get_jwt_identity()['id']
+    user_id = int(get_jwt_identity())
     appt = Appointment.query.filter_by(id=appointment_id, user_id=user_id).first()
     if not appt:
         return error('Appointment not found', 404)

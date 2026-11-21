@@ -1,76 +1,16 @@
-
-import { ClipboardList, Droplet, Calendar, Users, BarChart2, BookOpen } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpen, CalendarDays, CreditCard, Droplets, Utensils, UsersRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const features = [
-  {
-    title: 'Smart Food Tracking',
-    desc: 'Log meals with an Indian food database, auto‑calculate calories and macros.',
-    icon: ClipboardList,
-    cta: '/features',
-    ctaLabel: 'Learn More',
-  },
-  {
-    title: 'Hydration Tracker',
-    desc: 'Stay hydrated with reminders and water‑intake charts.',
-    icon: Droplet,
-    cta: '/features',
-    ctaLabel: 'Learn More',
-  },
-  {
-    title: 'Personalized Diet Plans',
-    desc: 'Tailor‑made meal plans based on goals, activity and dietary preferences.',
-    icon: Calendar,
-    cta: '/features',
-    ctaLabel: 'Learn More',
-  },
-  {
-    title: 'Expert Nutritionist Consultations',
-    desc: 'Book video calls with certified Indian nutritionists.',
-    icon: Users,
-    cta: '/nutritionists',
-    ctaLabel: 'Find a Nutritionist',
-  },
-  {
-    title: 'Progress Insights',
-    desc: 'Visual dashboards for weight, macro, water and activity trends.',
-    icon: BarChart2,
-    cta: '/features',
-    ctaLabel: 'See Insights',
-  },
-  {
-    title: 'Educational Hub',
-    desc: 'Access articles, guides and videos on nutrition and wellness.',
-    icon: BookOpen,
-    cta: '/hub',
-    ctaLabel: 'Explore Hub',
-  },
+const items = [
+  { title: 'Food Tracking that speaks Indian', text: 'Log familiar meals and ingredients, from dal and roti to idli and paneer. See calories and macronutrients add up as you record breakfast, lunch, dinner and snacks.', points: ['Indian food database with serving sizes', 'Calories, protein, carbs and fats at a glance', 'Edit or remove logged meals anytime'], icon: Utensils, image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85' },
+  { title: 'Hydration you can actually feel', text: 'Make water tracking quick enough to keep up with. Add a glass, see your daily goal progress and build a steady hydration habit.', points: ['Fast daily water logging', 'Progress toward your personal goal', 'Hydration history in your dashboard'], icon: Droplets, image: 'https://images.unsplash.com/photo-1538300342682-cf57afb97285?auto=format&fit=crop&w=1200&q=85' },
+  { title: 'A weekly diet planner built on rules, not vibes', text: 'Get a practical meal plan shaped by your goals, activity, dietary preference and allergies. Your weekly plan keeps familiar foods in reach.', points: ['Vegetarian, vegan and Jain preferences', 'Goal and activity aware recommendations', 'A clear week-at-a-glance plan'], icon: CalendarDays, image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=85' },
+  { title: 'Nutritionist consultations, end to end', text: 'Discover nutritionists by specialty and fee, review their profile and book a session. Booking status and payment details stay together in your account.', points: ['Browse verified sample profiles', 'Compare expertise and session prices', 'Track your consultation bookings'], icon: UsersRound, image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=1200&q=85', link: '/nutritionists', linkText: 'Find a nutritionist' },
+  { title: 'Real analytics for real progress', text: 'Your dashboard turns your own entries into useful daily totals and weekly trends, so you can spot patterns and adjust with confidence.', points: ['Calorie and macro summaries', 'Hydration and weight trends', 'Targets based on your onboarding profile'], icon: BarChart3, image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=85' },
+  { title: 'Learn at your own pace', text: 'Explore short, approachable guides to macronutrients, balanced plates and healthier Indian food choices. No complicated nutrition language required.', points: ['Practical, readable nutrition articles', 'Everyday meal ideas and swaps', 'Learn while using your tracker'], icon: BookOpen, image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85', link: '/hub', linkText: 'Explore the hub' },
+  { title: 'Transparent payments', text: 'When a consultation is booked, the app keeps payment and booking status connected, giving you a clear record of each step.', points: ['Visible session fees before booking', 'Payment status on your booking', 'Simple consultation history'], icon: CreditCard, image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=85' },
 ];
 
 export default function FeaturesPage() {
-  return (
-    <div className="space-y-12 max-w-5xl mx-auto py-8 px-4">
-      <section className="text-center py-12 bg-mint rounded-lg shadow">
-        <h1 className="text-4xl font-heading text-forest mb-4">Our Premium Features</h1>
-        <p className="text-body text-lg max-w-2xl mx-auto">
-          NutriFlex brings together science‑backed nutrition tools and expert guidance to help you live your healthiest life.
-        </p>
-      </section>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {features.map((f) => {
-          const Icon = f.icon;
-          return (
-            <div key={f.title} className="p-6 bg-cream rounded-lg shadow border border-sage flex flex-col items-center text-center">
-              <Icon className="w-12 h-12 text-forest mb-4" />
-              <h3 className="text-xl font-heading text-forest mb-2">{f.title}</h3>
-              <p className="text-body mb-4">{f.desc}</p>
-              <Link to={f.cta} className="text-gold underline">{f.ctaLabel}</Link>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  return <div className="nf-page nf-features"><header className="nf-page-hero"><div className="nf-kicker">FEATURES</div><h1>Everything is connected — track, plan, learn, consult.</h1><p>NutriFlex brings your everyday nutrition tools and expert support together in one calm, practical space.</p></header><div className="nf-features-list">{items.map(({ title, text, points, icon: Icon, image, link, linkText }, index) => <article className="nf-feature-detail" key={title}><div><div className="nf-icon-tile"><Icon size={20}/></div><h2>{title}</h2><p>{text}</p><ul>{points.map(point => <li key={point}>{point}</li>)}</ul>{link && <Link className="nf-text-link" to={link}>{linkText} <ArrowRight size={15}/></Link>}</div><img className="nf-feature-photo" src={image} alt="" loading={index > 1 ? 'lazy' : 'eager'}/></article>)}</div></div>;
 }
-

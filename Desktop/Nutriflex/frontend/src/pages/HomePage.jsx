@@ -1,138 +1,47 @@
-import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Activity, ArrowRight, BookOpen, Check, Droplets, Flame, HeartHandshake, Leaf, ShieldCheck, Utensils, Users, ChartNoAxesColumnIncreasing, Mail, Phone, MapPin, Star } from 'lucide-react';
+import api from '../services/api';
 
-export default function HomePage() {
-  const featureCards = [
-    { title: 'Smart Food Tracking', desc: 'Log meals with Indian food database, auto‑calc calories.' },
-    { title: 'Hydration Tracker', desc: 'Stay hydrated with reminders and water‑intake charts.' },
-    { title: 'Personalized Diet Plans', desc: 'Plans custom‑crafted for your goals and preferences.' },
-    { title: 'Expert Consultations', desc: 'Book video calls with certified nutritionists.' },
-    { title: 'Progress Insights', desc: 'Visual dashboards for weight, macro, and habit trends.' },
-    { title: 'Educational Hub', desc: 'Read articles on nutrition, recipes, and wellness.' },
-  ];
+const foodImage='https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1500&q=85';
+const featureCards=[
+ {icon:Utensils,title:'Smart Food Tracking',description:'Search a database of everyday Indian foods, log meals by category and see calories and macros add up automatically.'},
+ {icon:Droplets,title:'Hydration Tracker',description:'Quick-add glasses of water, watch your daily progress ring fill and build a habit your body will thank you for.'},
+ {icon:Leaf,title:'Personalized Diet Plans',description:'A rule-driven weekly planner that respects your vegetarian, vegan or Jain preferences, allergies and goals.'},
+ {icon:HeartHandshake,title:'Expert Consultations',description:'Browse verified nutritionist profiles, compare specialities and book a consultation when you need a human touch.'},
+ {icon:ChartNoAxesColumnIncreasing,title:'Progress Insights',description:'Real charts from your own logs — calorie trends, protein, hydration and weight over time.'},
+ {icon:BookOpen,title:'Educational Hub',description:'Bite-sized articles on macronutrients, balanced meals and healthy Indian eating, written for real life.'},
+];
+const people=[
+ {name:'Dr. Anjali Iyer',fee:'₹1,199',specialty:'Diabetes & Heart-healthy Diets',experience:'12 yrs',qualification:'Ph.D. Public Health Nutrition',slug:'dr-anjali-iyer',image:'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=85'},
+ {name:'Dr. Priya Sharma',fee:'₹799',specialty:'Weight Management & PCOS',experience:'9 yrs',qualification:'M.Sc. Clinical Nutrition, RD (Registered Dietitian)',slug:'dr-priya-sharma',image:'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=900&q=85'},
+ {name:'Kavya Nair, Clinical Dietitian',fee:'₹699',specialty:'Gut Health & Plant-based Diets',experience:'6 yrs',qualification:'M.Sc. Food & Nutrition, Certified Diabetes Educator',slug:'kavya-nair-clinical-dietitian',image:'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=85'},
+];
+const articles=[
+ {category:'FUNDAMENTALS',title:'Understanding Macronutrients',description:'Protein, carbs and fat explained — what each one actually does for your body and how much you need.',slug:'macronutrients',image:'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=85'},
+ {category:'HEALTHY HABITS',title:'How to Build Balanced Meals',description:'A visual, practical plate-building method you can apply to any cuisine — including everyday Indian food.',slug:'balanced-meals',image:'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1400&q=85'},
+ {category:'INDIAN DIET',title:'Healthy Indian Food Choices',description:'Idli over poori, curd over cream — smart swaps that keep Indian meals nutritious without losing joy.',slug:'indian-choices',image:'https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=1400&q=85'},
+];
 
-  const nutritionists = [
-    { name: 'Dr. Anjali Iyer', price: '₹1,199', slug: 'anjali-iyer' },
-    { name: 'Dr. Priya Sharma', price: '₹799', slug: 'priya-sharma' },
-    { name: 'Kavya Nair', price: '₹699', slug: 'kavya-nair' },
-  ];
-
-  const articles = [
-    { title: 'Understanding Macronutrients', slug: 'macronutrients' },
-    { title: 'How to Build Balanced Meals', slug: 'balanced-meals' },
-    { title: 'Healthy Indian Food Choices', slug: 'indian-choices' },
-  ];
-
-  return (
-    <div className="space-y-16">
-      {/* Hero */}
-      <section className="text-center py-16 bg-mint rounded-lg shadow">
-        <h1 className="text-5xl font-heading text-forest mb-4">Your Health Journey, Made Personal.</h1>
-        <p className="text-lg text-body mb-6">Eat Better. Live Better. Feel Your Best.</p>
-        <div className="flex justify-center space-x-4">
-          <Link to="/register" className="px-6 py-2 bg-forest text-cream rounded hover:bg-sage transition">Start Your Journey</Link>
-          <Link to="/features" className="px-6 py-2 bg-gold text-charcoal rounded hover:bg-cream transition">Explore Features</Link>
-        </div>
-      </section>
-
-      {/* Indian Food Preview */}
-      <section className="max-w-5xl mx-auto px-4">
-        <h2 className="text-3xl font-heading text-forest mb-4 text-center">Popular Indian Foods</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {["Idli", "Dosa", "Paneer Tikka", "Biryani", "Roti", "Lassi"].map((item) => (
-            <div key={item} className="p-4 bg-cream rounded border border-sage text-center">
-              <span className="text-body font-medium">{item}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Today's Snapshot */}
-      <section className="bg-cream py-8">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-          <div className="p-4 bg-mint rounded-lg shadow">
-            <h3 className="text-xl font-heading text-forest mb-2">Calories</h3>
-            <p className="text-2xl font-bold text-charcoal">2,200 kcal</p>
-          </div>
-          <div className="p-4 bg-mint rounded-lg shadow">
-            <h3 className="text-xl font-heading text-forest mb-2">Water</h3>
-            <p className="text-2xl font-bold text-charcoal">1.8 L</p>
-          </div>
-          <div className="p-4 bg-mint rounded-lg shadow">
-            <h3 className="text-xl font-heading text-forest mb-2">Active</h3>
-            <p className="text-2xl font-bold text-charcoal">45 min</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Cards */}
-      <section className="max-w-5xl mx-auto px-4">
-        <h2 className="text-3xl font-heading text-forest mb-8 text-center">Key Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featureCards.map((card) => (
-            <div key={card.title} className="p-6 bg-cream rounded-lg shadow border border-sage">
-              <h3 className="text-xl font-heading text-forest mb-2">{card.title}</h3>
-              <p className="text-body">{card.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-cream py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-heading text-forest mb-8 text-center">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-4xl font-bold text-forest mb-2">1</div>
-              <p className="font-heading text-forest">Create your profile & set goals.</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-forest mb-2">2</div>
-              <p className="font-heading text-forest">Track meals, water & activity.</p>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-forest mb-2">3</div>
-              <p className="font-heading text-forest">Get personalized insights & consult experts.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Nutritionists */}
-      <section className="max-w-5xl mx-auto px-4">
-        <h2 className="text-3xl font-heading text-forest mb-8 text-center">Our Nutritionists</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {nutritionists.map((n) => (
-            <div key={n.name} className="p-6 bg-cream rounded-lg shadow border border-sage text-center">
-              <h3 className="text-xl font-heading text-forest mb-2">{n.name}</h3>
-              <p className="text-body mb-2">Consultation: {n.price}</p>
-              <Link to={`/nutritionists/${n.slug}`} className="text-gold underline">View Profile</Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Educational Articles */}
-      <section className="bg-cream py-12">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-3xl font-heading text-forest mb-8 text-center">Learn & Grow</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {articles.map((a) => (
-              <div key={a.title} className="p-4 bg-cream rounded-lg shadow border border-sage">
-                <h3 className="font-heading text-forest mb-2">{a.title}</h3>
-                <Link to={`/hub/${a.slug}`} className="text-gold underline">Read Article</Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="text-center py-12 bg-mint rounded-lg shadow">
-        <h2 className="text-4xl font-heading text-forest mb-4">Ready to Transform Your Nutrition?</h2>
-        <Link to="/register" className="px-8 py-3 bg-forest text-cream rounded hover:bg-sage transition inline-block">Get Started Today</Link>
-      </section>
-    </div>
-  );
+export default function HomePage(){
+ const [form,setForm]=useState({name:'',email:'',message:''});const [notice,setNotice]=useState('');const [sending,setSending]=useState(false);
+ const update=e=>setForm({...form,[e.target.name]:e.target.value});
+ const send=async e=>{e.preventDefault();setSending(true);setNotice('');try{const r=await api.post('/contact/',form);setNotice(r.data.message||'Thanks for reaching out.');setForm({name:'',email:'',message:''});}catch(err){setNotice(err.response?.data?.message||'Could not send your note. Please try again.')}finally{setSending(false)}};
+ return <div className="nf-home">
+  <section className="nf-hero">
+   <div className="nf-hero-copy"><div className="nf-kicker"><HeartHandshake size={15}/> YOUR PERSONAL NUTRITION AND WELLNESS COMPANION</div><h1>Your Health Journey,<br/><em>Made Personal.</em></h1><p>NutriFlex turns everyday Indian meals into clear nutrition data — track what you eat, stay hydrated, follow a plan built around your preferences, and consult certified nutritionists when you need a human touch.</p><div className="nf-hero-actions"><Link className="nf-pill-button filled" to="/register">Start Your Journey <ArrowRight size={17}/></Link><Link className="nf-pill-button outline" to="/features">Explore Features</Link></div><div className="nf-proof-points"><span><Flame size={15}/> 15+ Indian foods in the database</span><span><Star size={15}/> 4 sample expert profiles</span></div></div>
+   <div className="nf-hero-photo"><img src={foodImage} alt="Colorful fresh salad bowl with avocado and greens"/><div className="nf-snapshot"><span>TODAY'S SNAPSHOT</span><b>1,480 <small>/ 1,900 kcal</small></b><i><u/></i></div><div className="nf-hydration-float"><Droplets size={16}/> 2.1 L hydrated</div></div>
+  </section>
+  <section className="nf-why nf-section"><div className="nf-shell"><div className="nf-kicker">WHY NUTRIFLEX</div><h2>Everything your nutrition needs, in one calm place</h2><div className="nf-feature-grid">{featureCards.map(({icon:Icon,title,description})=><article className="nf-feature-card" key={title}><span className="nf-icon-tile"><Icon size={19}/></span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
+  <section className="nf-how nf-section"><div className="nf-shell"><div className="nf-kicker">HOW IT WORKS</div><h2>Three steps to feeling your best</h2><div className="nf-steps">{[
+   ['01','Tell us about you','A 4-step onboarding captures your body stats, dietary preference, activity level and fitness goal.'],
+   ['02','Track and plan daily','Log meals and water in seconds, follow your personalized weekly plan and watch targets come alive.'],
+   ['03','Meet your expert','Book a nutritionist consultation when you want a human plan — payments are verified end to end.'],
+  ].map(([number,title,body])=><article key={number}><span>{number}</span><h3>{title}</h3><p>{body}</p></article>)}</div></div></section>
+  <section className="nf-experts nf-section"><div className="nf-shell"><div className="nf-section-heading"><div><div className="nf-kicker">EXPERT CARE</div><h2>Meet the nutritionists</h2><p>Sample demonstration profiles — browse their specialities and book a consultation from the dashboard.</p></div><Link to="/nutritionists" className="nf-pill-button outline">View all <ArrowRight size={16}/></Link></div><div className="nf-expert-grid">{people.map(p=><Link className="nf-expert-card" to={`/nutritionists/${p.slug}`} key={p.name}><img src={p.image} alt={p.name}/><div className="nf-expert-copy"><div className="nf-expert-title"><h3>{p.name}</h3><b>{p.fee}</b></div><p>{p.specialty} · {p.experience}</p><small>{p.qualification}</small></div></Link>)}</div></div></section>
+  <section className="nf-command"><div className="nf-shell nf-command-inner"><div className="nf-command-copy"><div className="nf-kicker gold">YOUR COMMAND CENTER</div><h2>A dashboard that knows your goal</h2><p>Your calorie target, macros and water goal are computed from your onboarding profile — never guessed. Log a meal and the rings, charts and weekly trends update from your own database records.</p><ul><li><Check size={15}/> Daily calorie and macro targets tuned by goal</li><li><Check size={15}/> Weekly calorie, hydration and weight charts</li><li><Check size={15}/> Upcoming consultations and quick actions</li></ul><Link to="/dashboard" className="nf-pill-button light">See your dashboard <ArrowRight size={16}/></Link></div><div className="nf-dashboard-preview"><div className="nf-preview-stats"><article><span>CALORIES</span><b>1,480</b><i><u/></i></article><article><span>PROTEIN</span><b>82 g</b><i><u/></i></article><article><span>WATER</span><b>2.1 L</b><i><u/></i></article></div><div className="nf-preview-chart">{[54,73,39,88,62,51,79].map((h,i)=><i key={i} style={{height:`${h}%`}}/>)}</div><div className="nf-preview-tabs"><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span></div></div></div></section>
+  <section className="nf-learning nf-section"><div className="nf-shell"><div className="nf-section-heading"><div><div className="nf-kicker">LEARN AS YOU GO</div><h2>From the Educational Hub</h2></div><Link to="/hub" className="nf-pill-button outline">Visit the Hub <ArrowRight size={16}/></Link></div><div className="nf-article-grid">{articles.map(a=><Link key={a.slug} to={`/hub/${a.slug}`} className="nf-article-card"><img src={a.image} alt=""/><div><span>{a.category}</span><h3>{a.title}</h3><p>{a.description}</p></div></Link>)}</div></div></section>
+  <section className="nf-contact nf-section"><div className="nf-shell nf-contact-grid"><div><div className="nf-kicker">CONTACT</div><h2>Talk to the NutriFlex team</h2><p>Questions about the platform, partnerships or campus demos — drop a note and we will reply within 2 working days.</p><div className="nf-contact-info"><a href="mailto:hello@nutriflex.app"><Mail size={17}/> hello@nutriflex.app</a><a href="tel:18000004567"><Phone size={17}/> 1800-000-4567</a><span><MapPin size={17}/> 4th Floor, Green Park Towers, Bengaluru, India</span></div></div><form className="nf-contact-form" onSubmit={send}>{notice&&<div className="nf-contact-notice">{notice}</div>}<label>Your name<input name="name" value={form.name} onChange={update} placeholder="Your name" required/></label><label>Email address<input name="email" type="email" value={form.email} onChange={update} placeholder="you@example.com" required/></label><label>Message<textarea name="message" value={form.message} onChange={update} placeholder="How can we help?" rows={4} minLength={10} required/></label><button className="nf-pill-button filled" disabled={sending}>{sending?'Sending…':'Send Message'} <ArrowRight size={16}/></button></form></div></section>
+  <section className="nf-final-cta"><div className="nf-shell"><div className="nf-kicker">YOUR NEXT CHAPTER</div><h2>Eat Better. Live Better.<br/><em>Feel Your Best.</em></h2><p>Join NutriFlex today — your first week of tracking, planning and learning is free.</p><Link className="nf-pill-button filled" to="/register">Start Your Journey <ArrowRight size={16}/></Link><span className="nf-cta-leaf"><Leaf size={88}/></span></div></section>
+ </div>
 }

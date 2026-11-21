@@ -12,7 +12,7 @@ def _get_current_user():
     identity = get_jwt_identity()
     if not identity:
         return None
-    return User.query.get(identity['id'])
+    return User.query.get(int(identity))
 
 @profile_bp.route('/', methods=['GET'])
 @jwt_required()
@@ -63,6 +63,7 @@ def create_profile():
         dietary_preference=data.get('dietary_preference'),
         activity_level=data.get('activity_level'),
         goals=data.get('goals'),
+        allergies=data.get('allergies'),
         food_restrictions=data.get('food_restrictions'),
         disliked_foods=data.get('disliked_foods'),
     )

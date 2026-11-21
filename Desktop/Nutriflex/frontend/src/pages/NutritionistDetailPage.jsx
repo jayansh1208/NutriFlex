@@ -1,79 +1,21 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { UserCheck } from 'lucide-react';
+import { useEffect,useState } from 'react';
+import { Link,useNavigate,useParams } from 'react-router-dom';
+import { ArrowLeft,CalendarDays,CheckCircle2,Clock3,UserRound,ShieldCheck } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
-// Same data as NutritionistsPage (hardcoded for demo)
-const nutritionists = [
-  {
-    slug: 'anjali-iyer',
-    name: 'Dr. Anjali Iyer',
-    price: '₹1,199',
-    experience: '12 years',
-    specialization: 'Diabetes & Heart‑healthy Diets',
-    qualification: 'Ph.D. Public Health Nutrition',
-    about: 'Dr. Iyer focuses on evidence‑based nutrition plans that help manage blood sugar and promote cardiovascular health, especially for Indian dietary patterns.',
-    expertise: ['Meal Planning', 'Blood Sugar Management', 'Heart‑Healthy Recipes'],
-  },
-  {
-    slug: 'priya-sharma',
-    name: 'Dr. Priya Sharma',
-    price: '₹799',
-    experience: '9 years',
-    specialization: 'Weight Management & PCOS',
-    qualification: 'M.Sc. Clinical Nutrition, RD',
-    about: 'Dr. Sharma specializes in sustainable weight‑loss programs and hormonal balance for PCOS, tailoring plans to Indian cuisine.',
-    expertise: ['Weight Loss', 'PCOS Management', 'Balanced Indian Meals'],
-  },
-  {
-    slug: 'kavya-nair',
-    name: 'Kavya Nair',
-    price: '₹699',
-    experience: '6 years',
-    specialization: 'Gut Health & Plant‑based Diets',
-    qualification: 'M.Sc. Food & Nutrition, Certified Diabetes Educator',
-    about: 'Kavya helps clients improve digestion and transition to plant‑based meals while respecting regional flavors.',
-    expertise: ['Gut Health', 'Plant‑Based Recipes', 'Digestive Coaching'],
-  },
+const times=['09:00','10:00','11:00','12:00','14:00','15:00','16:00'];
+const profilePortraits=[
+ 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=900&q=85',
+ 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&w=900&q=85',
+ 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=900&q=85',
 ];
-
-export default function NutritionistDetailPage() {
-  const { id } = useParams(); // id corresponds to slug
-  const nutri = nutritionists.find((n) => n.slug === id);
-
-  if (!nutri) {
-    return (
-      <div className="max-w-3xl mx-auto py-12 text-center">
-        <h2 className="text-3xl font-heading text-forest mb-4">Nutritionist Not Found</h2>
-        <p className="text-body mb-6">We couldn't find the requested nutritionist.</p>
-        <Link to="/nutritionists" className="text-gold underline">Back to Nutritionists</Link>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-8 max-w-4xl mx-auto py-12 px-4">
-      <section className="text-center py-8 bg-cream rounded-lg shadow border border-sage">
-        <UserCheck className="w-16 h-16 text-forest mx-auto mb-4" />
-        <h1 className="text-4xl font-heading text-forest mb-2">{nutri.name}</h1>
-        <p className="text-body mb-2">{nutri.specialization}</p>
-        <p className="text-body mb-2">{nutri.experience}</p>
-        <p className="text-body mb-2">{nutri.qualification}</p>
-        <p className="font-bold text-gold mb-4">Consultation: {nutri.price}</p>
-        <Link to="/register" className="px-6 py-2 bg-forest text-cream rounded hover:bg-sage transition">
-          Register to Book Consultation (Demo)
-        </Link>
-      </section>
-
-      <section className="bg-mint p-6 rounded-lg shadow border border-sage">
-        <h2 className="text-2xl font-heading text-forest mb-4">About {nutri.name}</h2>
-        <p className="text-body mb-4">{nutri.about}</p>
-        <h3 className="text-xl font-heading text-forest mb-2">Areas of Expertise</h3>
-        <ul className="list-disc list-inside text-body">
-          {nutri.expertise.map((e) => (
-            <li key={e}>{e}</li>
-          ))}
-        </ul>
-      </section>
-    </div>
-  );
+export default function NutritionistDetailPage(){
+ const {id}=useParams();const {user}=useAuth();const nav=useNavigate();const [person,setPerson]=useState(null),[date,setDate]=useState(''),[time,setTime]=useState(times[0]),[message,setMessage]=useState(''),[demoOrder,setDemoOrder]=useState(null),[busy,setBusy]=useState(false);
+ useEffect(()=>{api.get(`/nutritionists/lookup/${encodeURIComponent(id)}`).then(r=>setPerson(r.data)).catch(()=>setPerson(false));},[id]);
+ const book=async(e)=>{e.preventDefault();if(!user){nav('/login');return;}setBusy(true);setMessage('');setDemoOrder(null);try{const r=await api.post('/payments/create-order',{nutritionist_id:person.id,date,time});const checkout=r.data.data;if(checkout.mode==='mock'){setDemoOrder(checkout);setMessage(checkout.demo_label);}else{let script=document.querySelector('#razorpay-checkout');if(!script){script=document.createElement('script');script.id='razorpay-checkout';script.src='https://checkout.razorpay.com/v1/checkout.js';document.body.appendChild(script);await new Promise((resolve,reject)=>{script.onload=resolve;script.onerror=reject;});}const options={key:checkout.key_id,amount:Math.round(checkout.payment.amount*100),currency:checkout.payment.currency,name:'NutriFlex',description:`Consultation with ${person.name}`,order_id:checkout.payment.order_id,prefill:{name:user.full_name,email:user.email},handler:async response=>{try{await api.post('/payments/verify',{order_id:checkout.payment.order_id,razorpay_payment_id:response.razorpay_payment_id,razorpay_signature:response.razorpay_signature});setMessage('Payment verified. Your appointment is confirmed.');}catch(err){setMessage(err.response?.data?.message||'Payment verification failed. Contact support with your order ID.');}},modal:{ondismiss:()=>setMessage('Checkout closed. Your booking is still pending payment.')}};new window.Razorpay(options).open();}}catch(err){setMessage(err.response?.data?.message||'Could not start checkout.');}finally{setBusy(false)}};
+ const confirmDemo=async()=>{if(!demoOrder)return;setBusy(true);try{const r=await api.post('/payments/verify',{order_id:demoOrder.payment.order_id,demo_confirm:true});setDemoOrder(null);setMessage(`Demo payment recorded. No money was charged. Appointment ${r.data.data.appointment_status.toLowerCase()}.`);}catch(err){setMessage(err.response?.data?.message||'Could not confirm the demo checkout.')}finally{setBusy(false)}};
+ if(person===null)return <div className="nf-loading">Loading profile…</div>;
+ if(person===false)return <div className="nf-onboard"><div className="nf-panel"><h2>Profile not found</h2><Link to="/nutritionists" className="nf-button secondary"><ArrowLeft size={15}/> Back to nutritionists</Link></div></div>;
+ return <div className="nf-profile-page"><Link to="/nutritionists" className="nf-back-link"><ArrowLeft size={15}/> All nutritionists</Link><div className="nf-profile-grid"><section className="nf-profile-main"><div className="nf-profile-hero"><div className="nf-nutri-avatar large"><img src={person.image_url||profilePortraits[(person.name?.length||0)%profilePortraits.length]} alt={person.name} /></div><div><div className="nf-eyebrow">NUTRIFLEX EXPERT</div><h1>{person.name}</h1><p>{person.specialization}</p></div></div><div className="nf-panel"><h2>About {person.name}</h2><p className="nf-profile-bio">{person.biography||'A nutrition professional supporting practical, sustainable wellbeing habits.'}</p><div className="nf-profile-facts"><div><span>Qualification</span><b>{person.qualification||'Nutrition professional'}</b></div><div><span>Experience</span><b>{person.experience_years||0} years</b></div><div><span>Consultation</span><b>{Number(person.consultation_fee)>0?`₹${Number(person.consultation_fee).toLocaleString('en-IN')}`:'Fee on request'}</b></div></div><div className="nf-profile-availability"><Clock3 size={15}/><span>{person.availability||'Contact for availability'}</span></div></div></section><aside className="nf-panel nf-book-card"><div className="nf-eyebrow">START A CONVERSATION</div><h2>Request a consultation</h2><p className="nf-muted">Choose a time that works for you.</p><form onSubmit={book} className="nf-book-form"><label>Date<input type="date" min={new Date().toISOString().slice(0,10)} value={date} onChange={e=>setDate(e.target.value)} required/></label><label>Available time<select value={time} onChange={e=>setTime(e.target.value)}>{times.map(t=><option key={t}>{t}</option>)}</select></label><button className="nf-button primary" disabled={busy}>{busy?'Preparing checkout…':user?'Continue to payment':'Log in to continue'} <CalendarDays size={15}/></button></form>{demoOrder&&<div className="nf-demo-checkout"><b>{demoOrder.demo_label}</b><span>Test checkout for ₹{demoOrder.payment.amount}</span><button onClick={confirmDemo} disabled={busy} className="nf-button secondary">Confirm demo payment</button></div>}{message&&<p className="nf-book-message"><CheckCircle2 size={15}/>{message}</p>}<p className="nf-subtle"><ShieldCheck size={13}/> {person.consultation_fee>0?`Secure checkout · ₹${Number(person.consultation_fee).toLocaleString('en-IN')}`:'Consultation fee on request'}. Mock mode never charges money.</p></aside></div></div>
 }

@@ -11,14 +11,14 @@ app = create_app()
 
 def seed():
     with app.app_context():
-        # Drop and create all tables for clean seed
-        db.drop_all()
         db.create_all()
 
         # Admin user
-        admin = User(full_name='Admin User', email='admin@example.com', role='admin')
-        admin.set_password('admin123')
-        db.session.add(admin)
+        admin = User.query.filter_by(email='admin@example.com').first()
+        if not admin:
+            admin = User(full_name='Admin User', email='admin@example.com', role='admin')
+            admin.set_password('admin123')
+            db.session.add(admin)
 
         # Sample nutritionists
         nutritionists_data = [
@@ -28,7 +28,7 @@ def seed():
                 'qualification': 'MSc Nutrition',
                 'specialization': 'Weight Management',
                 'experience_years': 5,
-                'consultation_fee': 0.0,
+                'consultation_fee': 1199.0,
                 'biography': 'Experienced nutritionist focusing on holistic health.',
                 'availability': 'Mon-Fri 09:00-17:00',
             },
@@ -38,7 +38,7 @@ def seed():
                 'qualification': 'PhD Dietetics',
                 'specialization': 'Diabetes Care',
                 'experience_years': 8,
-                'consultation_fee': 0.0,
+                'consultation_fee': 799.0,
                 'biography': 'Specialist in diabetic nutrition plans.',
                 'availability': 'Tue-Thu 10:00-16:00',
             },
@@ -48,7 +48,7 @@ def seed():
                 'qualification': 'BSc Clinical Dietitian',
                 'specialization': 'Sports Nutrition',
                 'experience_years': 4,
-                'consultation_fee': 0.0,
+                'consultation_fee': 699.0,
                 'biography': 'Helps athletes optimize performance.',
                 'availability': 'Mon, Wed, Fri 08:00-12:00',
             },
@@ -58,13 +58,17 @@ def seed():
                 'qualification': 'MSc Clinical Nutrition',
                 'specialization': 'Gut Health',
                 'experience_years': 6,
-                'consultation_fee': 0.0,
+                'consultation_fee': 899.0,
                 'biography': 'Focus on digestive health and IBS.',
                 'availability': 'Tue, Thu 14:00-18:00',
             },
         ]
         nutritionists = []
         for nd in nutritionists_data:
+            existing=Nutritionist.query.filter_by(name=nd['name']).first()
+            if existing:
+                if not existing.consultation_fee: existing.consultation_fee=nd['consultation_fee']
+                continue
             n = Nutritionist(**nd)
             nutritionists.append(n)
         db.session.add_all(nutritionists)
@@ -87,7 +91,7 @@ def seed():
             {'name': 'Sprouts', 'serving_size': '1 cup', 'calories': 100, 'protein': 7, 'carbs': 15, 'fat': 0.5},
             {'name': 'Almonds', 'serving_size': '10 pieces', 'calories': 70, 'protein': 2.6, 'carbs': 2.5, 'fat': 6},
         ]
-        food_objs = [FoodItem(**f) for f in foods]
+        food_objs = [FoodItem(**f) for f in foods if not FoodItem.query.filter_by(name=f['name']).first()]
         db.session.add_all(food_objs)
 
         db.session.commit()

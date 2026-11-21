@@ -1,9 +1,6 @@
-export default function Footer() {
-  return (
-    <footer className="bg-forest text-cream py-6 mt-12">
-      <div className="container mx-auto text-center text-sm">
-        © {new Date().getFullYear()} NutriFlex – All rights reserved.
-      </div>
-    </footer>
-  );
+import { Link } from 'react-router-dom';
+import { Leaf, Mail, MapPin, Phone } from 'lucide-react';
+
+export default function Footer(){
+ return <footer className="nf-footer"><div className="nf-shell nf-footer-grid"><div className="nf-footer-brand"><Link to="/" className="nf-brand"><span><Leaf size={18}/></span><b>Nutri<span>Flex</span></b></Link><p>Eat Better. Live Better. Feel Your Best.</p><small>Your personal nutrition and wellness companion for tracking, planning and expert guidance.</small></div><div><h3>EXPLORE</h3><Link to="/about">About Us</Link><Link to="/features">Features</Link><Link to="/pricing">Pricing</Link><Link to="/contact">Contact Us</Link></div><div><h3>RESOURCES</h3><Link to="/nutritionists">Find a Nutritionist</Link><Link to="/hub">Educational Hub</Link><Link to="/login">Login</Link><Link to="/register">Create Account</Link></div><div><h3>REACH US</h3><a href="mailto:hello@nutriflex.app"><Mail size={15}/> hello@nutriflex.app</a><a href="tel:18000004567"><Phone size={15}/> 1800-000-4567</a><span><MapPin size={15}/> 4th Floor, Green Park Towers, Bengaluru, India</span></div></div><div className="nf-footer-bottom"><span>© {new Date().getFullYear()} NutriFlex. A demonstration prototype built for academic presentation.</span><span>NutriFlex offers educational guidance — not medical advice. Consult a qualified professional for clinical care.</span></div></footer>
 }

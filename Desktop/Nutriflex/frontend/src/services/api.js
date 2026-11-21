@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Base URL for the backend API
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV
+    ? 'http://127.0.0.1:5000/api'
+    : 'https://nutriflex-im86.onrender.com/api'),
   timeout: 10000,
 });
 

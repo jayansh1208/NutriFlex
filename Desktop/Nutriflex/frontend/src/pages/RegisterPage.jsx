@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2 } from 'lucide-react';
+import api from '../services/api';
 
 export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
@@ -32,20 +33,11 @@ export default function RegisterPage() {
     }
     setSubmitting(true);
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ full_name: fullName, email, password }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setSuccess('Registration successful! Redirecting to login…');
-        setTimeout(() => navigate('/login'), 1500);
-      } else {
-        setError(data.message || data.error || 'Registration failed');
-      }
+      await api.post('/auth/register', { full_name: fullName, email, password });
+      setSuccess('Registration successful! Redirecting to login…');
+      setTimeout(() => navigate('/login'), 1500);
     } catch (e) {
-      setError('Network error');
+      setError(e.response?.data?.message || e.response?.data?.error || (e.request ? 'Could not reach the server. Please try again.' : 'Registration failed. Please try again.'));
     } finally {
       setSubmitting(false);
     }

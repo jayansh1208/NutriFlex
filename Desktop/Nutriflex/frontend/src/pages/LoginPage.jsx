@@ -28,7 +28,9 @@ export default function LoginPage() {
         setError(result.message || 'Login failed');
       }
     } catch (err) {
-      setError('Unexpected error');
+      setError(err.response?.data?.message || (err.code === 'ECONNABORTED'
+        ? 'The server is taking longer to wake up. Please wait a moment and try again.'
+        : 'Could not reach the server. Please wait a moment and try again.'));
     } finally {
       setSubmitting(false);
     }

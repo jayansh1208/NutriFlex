@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import api from '../services/api';
 
 export default function RegisterPage() {
@@ -9,6 +9,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -71,24 +73,36 @@ export default function RegisterPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest focus:ring-forest"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <label htmlFor="register-password" className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="relative mt-1">
+              <input
+                id="register-password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                className="block w-full rounded-md border-gray-300 pr-11 shadow-sm focus:border-forest focus:ring-forest"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-2 text-gray-500 hover:text-forest focus:outline-none focus:ring-2 focus:ring-forest">
+                {showPassword ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input
-              type="password"
-              required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest focus:ring-forest"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+            <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <div className="relative mt-1">
+              <input
+                id="confirm-password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                className="block w-full rounded-md border-gray-300 pr-11 shadow-sm focus:border-forest focus:ring-forest"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <button type="button" onClick={() => setShowConfirmPassword((visible) => !visible)} aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'} aria-pressed={showConfirmPassword} className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-2 text-gray-500 hover:text-forest focus:outline-none focus:ring-2 focus:ring-forest">
+                {showConfirmPassword ? <EyeOff size={17} aria-hidden="true" /> : <Eye size={17} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
